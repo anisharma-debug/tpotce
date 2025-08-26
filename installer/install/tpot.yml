@@ -19,8 +19,9 @@
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Check if python3 is installed (All)
       raw: echo $(command -v python3)
@@ -31,8 +32,9 @@
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Add python package (Debian, Raspbian, Ubuntu)
       raw: |
@@ -44,20 +46,21 @@
         - "Raspbian"
         - "Ubuntu"
 
-    - name: Add python package (Alma, Fedora, Rocky)
+    - name: Add python package (Alma, Fedora, Oracle Linux Server, OracleLinux)
       raw: |
         dnf -y --refresh install python3
-      when: my_distribution.stdout | trim in ["AlmaLinux", "Fedora", "Rocky"] and my_python3.stdout | trim == ""
+      when: my_distribution.stdout | trim in ["AlmaLinux", "Fedora", "Oracle Linux Server", "OracleLinux"] and my_python3.stdout | trim == ""
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
     - name: Add python package (openSUSE Tumbleweed)
       raw: |
         zypper refresh
         zypper -y install python3
-      when: my_distribution.stdout | trim in ["AlmaLinux", "Fedora", "Rocky"] and my_python3.stdout | trim == ""
+      when: my_distribution.stdout | trim in ["AlmaLinux", "Fedora", "Oracle Linux Server", "OracleLinux"] and my_python3.stdout | trim == ""
       tags:
         - "openSUSE Tumbleweed"
 
@@ -75,8 +78,9 @@
     - "Fedora"
     - "openSUSE Tumbleweed"
     - "Raspbian"
-    - "Rocky"
+    - "Oracle Linux Server"
     - "Ubuntu"
+    - "OracleLinux"
 
   tasks:
     - name: Check if running as root (All)
@@ -93,7 +97,7 @@
 
     - name: Check if supported distribution (All)
       assert:
-        that: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+        that: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
         fail_msg: "T-Pot is not supported on this plattform: {{ ansible_distribution }}."
         success_msg: "T-Pot will now install on {{ ansible_distribution }}."
 
@@ -109,7 +113,7 @@
   tasks:
     - name: Syncing clocks (All)
       shell: "hwclock --hctosys"
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       ignore_errors: true
       tags:
         - "AlmaLinux"
@@ -117,8 +121,9 @@
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Install recommended packages (Debian, Raspbian, Ubuntu)
       package:
@@ -145,17 +150,17 @@
         - "Raspbian"
         - "Ubuntu"
 
-    - name: Install grc from remote repo (AlmaLinux, Rocky)
+    - name: Install grc from remote repo (AlmaLinux, Oracle Linux Server, "OracleLinux")
       ansible.builtin.dnf:
         name: 'https://github.com/kriipke/grc/releases/download/1.13.8/grc-1.13.8-1.el7.noarch.rpm'
         disable_gpg_check: true
         state: present
-      when: ansible_distribution in ["AlmaLinux", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
-        - "Rocky"
+        - "Oracle Linux Server"
 
-    - name: Install recommended packages (AlmaLinux, Rocky)
+    - name: Install recommended packages (AlmaLinux, Oracle Linux Server, OracleLinux)
       package:
         name:
           - bash-completion
@@ -173,20 +178,22 @@
           - wget
         state: latest
         update_cache: yes
-      when: ansible_distribution in ["AlmaLinux", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
-    - name: Download and install micro editor (AlmaLinux, openSUSE Tumbleweed, Rocky)
+    - name: Download and install micro editor (AlmaLinux, openSUSE Tumbleweed, Oracle Linux Server, OracleLinux)
       shell: "curl https://getmic.ro | bash && mv micro /usr/bin"
       args:
         executable: /bin/bash
-      when: ansible_distribution in ["AlmaLinux", "openSUSE Tumbleweed", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "openSUSE Tumbleweed", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "openSUSE Tumbleweed"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
     - name: Install recommended packages (Fedora)
       package:
@@ -255,7 +262,7 @@
   become: true
 
   tasks:
-    - name: Remove distribution based Docker packages and podman-docker (AlmaLinux, Debian, Fedora, Raspbian, Rocky, Ubuntu)
+    - name: Remove distribution based Docker packages and podman-docker (AlmaLinux, Debian, Fedora, Raspbian, Oracle Linux Server, Ubuntu)
       package:
         name:
           - docker
@@ -267,13 +274,13 @@
           - podman
         state: absent
         update_cache: yes
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "Raspbian", "Oracle Linux Server", "Ubuntu"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
 
     - name: Add folder for Docker Engine GPG key (Debian, Raspbian, Ubuntu)
@@ -330,16 +337,19 @@
       tags:
         - "Fedora"
 
-    - name: Add Docker repository (AlmaLinux, Rocky)
+    - name: Add Docker repository (AlmaLinux, Oracle Linux Server, OracleLinux)
       shell: |
         if [ "$(dnf repolist docker-ce-stable)" == "" ];
           then
             dnf -y config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
         fi
-      when: ansible_distribution in ["AlmaLinux", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
+        
+    
 
 
 #################################
@@ -368,7 +378,7 @@
       tags:
         - "openSUSE Tumbleweed"
 
-    - name: Install Docker Engine packages (AlmaLinux, Debian, Fedora, Raspbian, Rocky, Ubuntu)
+    - name: Install Docker Engine packages (AlmaLinux, Debian, Fedora, Raspbian, Oracle Linux Server, Ubuntu, OracleLinux)
       package:
         name:
           - docker-ce 
@@ -378,29 +388,31 @@
           - docker-compose-plugin 
         state: latest
         update_cache: yes
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Stop Docker (All)
       service:
         name: docker
         state: stopped
         enabled: false
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
 ######################################################
 # T-Pot - Adjust configs, add users and groups, etc. #
@@ -417,15 +429,16 @@
         name: tpot
         gid: 2000
         state: present
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Create T-Pot user (All)
       user:
@@ -435,15 +448,16 @@
         shell: /bin/false
         home: /nonexistent
         group: tpot
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Ensure vm.max_map_count is set (All)
       lineinfile:
@@ -451,15 +465,16 @@
         line: "vm.max_map_count=262144"
         state: present
         create: yes
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Disable ssh.socket unit (Ubuntu)
       systemd:
@@ -478,34 +493,36 @@
       tags:
         - "Ubuntu"
 
-    - name: Comment out Port(s) in sshd_config, can cause port conflicts on deploy (AlmaLinux, Debian, Fedora, openSUSE Tumbleweed, Raspbian, Rocky, Ubuntu)
+    - name: Comment out Port(s) in sshd_config, can cause port conflicts on deploy (AlmaLinux, Debian, Fedora, openSUSE Tumbleweed, Raspbian, Oracle Linux Server, Ubuntu, OracleLinux)
       ansible.builtin.replace:
         path: /etc/ssh/sshd_config
         regexp: '^(Port (?!64295$)[0-9]+)'
         replace: '# \1'
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu" ,"OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
-    - name: Change SSH Port to 64295 (AlmaLinux, Debian, Fedora, Raspbian, Rocky, Ubuntu)
+    - name: Change SSH Port to 64295 (AlmaLinux, Debian, Fedora, Raspbian, Oracle Linux Server, Ubuntu, OracleLinux)
       lineinfile:
         path: /etc/ssh/sshd_config
         line: "Port 64295"
         insertafter: EOF
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "Ubuntu"
+        - "OracleLinux"
 
     - name: Change SSH Port to 64295 (openSUSE Tumbleweed)
       lineinfile:
@@ -516,68 +533,74 @@
       tags:
         - "openSUSE Tumbleweed"
 
-    - name: Add T-Pot SSH port to Firewall (AlmaLinux, Fedora, openSUSE Tumbleweed, Rocky)
+    - name: Add T-Pot SSH port to Firewall (AlmaLinux, Fedora, openSUSE Tumbleweed, Oracle Linux Server, OracleLinux)
       firewalld:
         port: 64295/tcp
         permanent: yes
         state: enabled
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
         - "openSUSE Tumbleweed"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
-    - name: Set T-Pot default target to ACCEPT (AlmaLinux, Fedora, openSUSE Tumbleweed, Rocky)
+    - name: Set T-Pot default target to ACCEPT (AlmaLinux, Fedora, openSUSE Tumbleweed, Oracle Linux Server, OracleLinux)
       firewalld:
         zone: public
         target: ACCEPT
         permanent: yes
         state: enabled
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
         - "openSUSE Tumbleweed"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
-    - name: Load kernel modules (AlmaLinux, Fedora, Rocky)
+    - name: Load kernel modules (AlmaLinux, Fedora, Oracle Linux Server, OracleLinux)
       command: modprobe -v iptable_filter
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
-    - name: Update iptables.conf (AlmaLinux, Fedora, Rocky)
+    - name: Update iptables.conf (AlmaLinux, Fedora, Oracle Linux Server, OracleLinux)
       lineinfile:
         path: /etc/modules-load.d/iptables.conf
         line: iptable_filter
         create: yes
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
-    - name: Set SELinux config to permissive (AlmaLinux, Fedora, Rocky)
+    - name: Set SELinux config to permissive (AlmaLinux, Fedora, Oracle Linux Server, OracleLinux)
       lineinfile:
         path: /etc/selinux/config
         regexp: '^SELINUX='
         line: 'SELINUX=permissive'
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
-    - name: Set SELinux to permissive (AlmaLinux, Fedora, Rocky)
+    - name: Set SELinux to permissive (AlmaLinux, Fedora, Oracle Linux Server, OracleLinux)
       command: "setenforce Permissive"
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
     - name: Stop Resolved (Fedora, Ubuntu)
       service:
@@ -627,50 +650,54 @@
         - "Fedora"
         - "Ubuntu"
 
-    - name: Restart Firewalld (AlmaLinux, Fedora, openSUSE Tumbleweed, Rocky)
+    - name: Restart Firewalld (AlmaLinux, Fedora, openSUSE Tumbleweed, Oracle Linux Server, OracleLinux)
       service:
         name: firewalld
         state: restarted
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "openSUSE Tumbleweed"
+        - "OracleLinux"
 
-    - name: Get Firewall rules (AlmaLinux, Fedora, openSUSE Tumbleweed, Rocky)
+    - name: Get Firewall rules (AlmaLinux, Fedora, openSUSE Tumbleweed, Oracle Linux Server, OracleLinux)
       command: "firewall-cmd --list-all"
       register: firewall_output
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
-        - "Rocky"
+        - "Oracle Linux Server"
         - "openSUSE Tumbleweed"
+        - "OracleLinux"
 
-    - name: Print Firewall rules (AlmaLinux, Fedora, openSUSE Tumbleweed, Rocky)
+    - name: Print Firewall rules (AlmaLinux, Fedora, openSUSE Tumbleweed, Oracle Linux Server, OracleLinux)
       debug:
         var: firewall_output.stdout_lines
-      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Rocky"]
+      when: ansible_distribution in ["AlmaLinux", "Fedora", "openSUSE Tumbleweed", "Oracle Linux Server", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Fedora"
         - "openSUSE Tumbleweed"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
 
     - name: Enable Docker Engine upon boot (All)
       service:
         name: docker
         state: restarted
         enabled: true
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
         - "Ubuntu"
 
     - name: Restart SSH (All)
@@ -678,14 +705,15 @@
         name: "{{ 'ssh' if ansible_distribution in ['Ubuntu'] else 'sshd' }}"
         state: restarted
         enabled: true
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
         - "Ubuntu"
 
 #######################################################################
@@ -702,14 +730,15 @@
     - "Fedora"
     - "openSUSE Tumbleweed"
     - "Raspbian"
-    - "Rocky"
+    - "Oracle Linux Server"
+    - "OracleLinux"
     - "Ubuntu"
 
   tasks:
     - name: Check for non-root user id (All)
       debug:
         msg: "Detected user: '{{ ansible_user_id }}'"
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       failed_when: ansible_user_id == "root"
 
     - name: Add aliases (All)
@@ -723,14 +752,15 @@
         marker: "# {mark} ANSIBLE MANAGED BLOCK"
         insertafter: EOF
         state: present
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
       tags:
         - "AlmaLinux"
         - "Debian"
         - "Fedora"
         - "openSUSE Tumbleweed"
         - "Raspbian"
-        - "Rocky"
+        - "Oracle Linux Server"
+        - "OracleLinux"
         - "Ubuntu"
 
     - name: Clone / Update T-Pot repository (All)
@@ -740,7 +770,7 @@
         version: master
         clone: yes
         update: no
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
 
     - name: Add current user to Docker, T-Pot group (All)
       become: true
@@ -750,7 +780,7 @@
           - docker
           - tpot
         append: yes
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
 
 ########################################
 # T-Pot - Install service and cron job #
@@ -766,7 +796,8 @@
     - "Fedora"
     - "openSUSE Tumbleweed"
     - "Raspbian"
-    - "Rocky"
+    - "Oracle Linux Server"
+    - "OracleLinux"
     - "Ubuntu"
 
   tasks:
@@ -779,7 +810,7 @@
         group: root
         mode: '0755'
       notify: Reload systemd and enable service
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
 
   handlers:
     - name: Reload systemd and enable service
@@ -789,7 +820,7 @@
         daemon_reload: yes
         state: stopped
         enabled: yes
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
 
 - name: T-Pot - Setup a randomized daily reboot
   hosts: all
@@ -801,7 +832,8 @@
     - "Fedora"
     - "openSUSE Tumbleweed"
     - "Raspbian"
-    - "Rocky"
+    - "Oracle Linux Server"
+    - "OracleLinux"
     - "Ubuntu"
 
   vars:
@@ -817,4 +849,4 @@
         hour: "{{ random_hour }}"
         job: "bash -c 'systemctl stop tpot.service && docker container prune -f; docker image prune -f; docker volume prune -f; /usr/sbin/shutdown -r +1 \"T-Pot Daily Reboot\"'"
         state: present
-      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Rocky", "Ubuntu"]
+      when: ansible_distribution in ["AlmaLinux", "Debian", "Fedora", "openSUSE Tumbleweed", "Raspbian", "Oracle Linux Server", "Ubuntu", "OracleLinux"]
